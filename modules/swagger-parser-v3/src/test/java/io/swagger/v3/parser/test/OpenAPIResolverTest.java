@@ -657,7 +657,7 @@ public class OpenAPIResolverTest {
         ParseOptions resolve = new ParseOptions();
         resolve.setResolveFully(true);
         final OpenAPI openAPI = new OpenAPIV3Parser().read("./ref-without-component/a.yaml", null, resolve);
-
+        Yaml.prettyPrint(openAPI);
         Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
         Assert.assertEquals("Example value", schemas.get("CustomerType").getExample());
     }
@@ -1158,6 +1158,20 @@ public class OpenAPIResolverTest {
         parseOptions.setResolve(true);
         parseOptions.setResolveFully(true);
         OpenAPI openAPI = new OpenAPIV3Parser().read("recursive2.yaml", null, parseOptions);
+        try {
+            Json.mapper().writeValueAsString(openAPI);
+        }
+        catch (Exception e) {
+            fail("Recursive loop found");
+        }
+    }
+
+    @Test
+    public void recursiveIssue984() {
+        ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setResolve(true);
+        parseOptions.setResolveFully(true);
+        OpenAPI openAPI = new OpenAPIV3Parser().read("issue-984.yaml", null, parseOptions);
         try {
             Json.mapper().writeValueAsString(openAPI);
         }
